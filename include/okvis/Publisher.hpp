@@ -145,7 +145,10 @@ class Publisher
    */
   void setPoints(const okvis::MapPointVector& pointsMatched,
                  const okvis::MapPointVector& pointsUnmatched,
-                 const okvis::MapPointVector& pointsTransferred);
+                 const okvis::MapPointVector& pointsTransferred,
+                 const okvis::kinematics::Transformation & T_WS,
+                 const std::vector<okvis::kinematics::Transformation,
+                  Eigen::aligned_allocator<okvis::kinematics::Transformation> > & extrinsics);
 
   /// @brief Set the time for the next message to be published.
   void setTime(const okvis::Time& t)
@@ -201,7 +204,9 @@ class Publisher
    */
   void publishLandmarksAsCallback(
       const okvis::Time & t, const okvis::MapPointVector & actualLandmarks,
-      const okvis::MapPointVector & transferredLandmarks);
+    const okvis::MapPointVector & transferredLandmarks,const okvis::kinematics::Transformation & T_WS,    
+    const std::vector<okvis::kinematics::Transformation,
+        Eigen::aligned_allocator<okvis::kinematics::Transformation> > & extrinsics);
 
   /**
    * @brief Set and write full state to CSV file.

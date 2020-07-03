@@ -358,7 +358,10 @@ void Publisher::setOdometry(const okvis::kinematics::Transformation& T_WS,
 // Set the points that are published next.
 void Publisher::setPoints(const okvis::MapPointVector& pointsMatched,
                           const okvis::MapPointVector& pointsUnmatched,
-                          const okvis::MapPointVector& pointsTransferred)
+                          const okvis::MapPointVector& pointsTransferred,
+                          const okvis::kinematics::Transformation & T_WS,
+                          const std::vector<okvis::kinematics::Transformation,
+        Eigen::aligned_allocator<okvis::kinematics::Transformation> > & extrinsics)
 {
   pointsMatched2_.clear();
   pointsMatched2_ = pointsMatched;
@@ -576,14 +579,18 @@ void Publisher::csvSaveFullStateWithExtrinsicsAsCallback(
   }
 }
 
+
+
 // Set and publish landmarks.
 void Publisher::publishLandmarksAsCallback(
     const okvis::Time & /*t*/, const okvis::MapPointVector & actualLandmarks,
-    const okvis::MapPointVector & transferredLandmarks)
+    const okvis::MapPointVector & transferredLandmarks,const okvis::kinematics::Transformation & T_WS,    
+    const std::vector<okvis::kinematics::Transformation,
+        Eigen::aligned_allocator<okvis::kinematics::Transformation> > & extrinsics)
 {
   if(parameters_.publishing.publishLandmarks){
     okvis::MapPointVector empty;
-    setPoints(actualLandmarks, empty, transferredLandmarks);
+    setPoints(actualLandmarks, empty, transferredLandmarks,T_WS,extrinsics);
     publishPoints();
   }
 }
@@ -593,8 +600,9 @@ void Publisher::csvSaveLandmarksAsCallback(
     const okvis::Time & /*t*/, const okvis::MapPointVector & actualLandmarks,
     const okvis::MapPointVector & transferredLandmarks)
 {
+  ROS_ERROR("not use");
   okvis::MapPointVector empty;
-  setPoints(actualLandmarks, empty, transferredLandmarks);
+  //setPoints(actualLandmarks, empty, transferredLandmarks);
   if (csvLandmarksFile_) {
     if (csvLandmarksFile_->good()) {
       for (size_t l = 0; l < actualLandmarks.size(); ++l) {
@@ -617,6 +625,7 @@ void Publisher::publishPoints()
   pubPointsUnmatched_.publish(pointsUnmatched_);
   pubPointsTransferred_.publish(pointsTransferred_);
 }
+
 
 // Set the images to be published next.
 void Publisher::setImages(const std::vector<cv::Mat> & images)
